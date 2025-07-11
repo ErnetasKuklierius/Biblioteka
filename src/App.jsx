@@ -1,13 +1,19 @@
-import { useState } from 'react'
-import  { Library } from './pages/library'
+import { Routes, Route, BrowserRouter } from 'react-router-dom'
+import { Books } from './pages/books'
+import { Navbar } from './components/Navbar'
+
 import './App.css'
 
 function App() {
 
   return (
-    <>
-      <Library></Library>
-    </>
+   <BrowserRouter>
+   <Navbar />
+   <Routes>
+   <Route path = "/" element={<Books />} />
+   </Routes>
+   
+   </BrowserRouter>
   )
 }
 
