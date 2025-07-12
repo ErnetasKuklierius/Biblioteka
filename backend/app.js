@@ -18,5 +18,5 @@ app.use('/api/books', require('./routes/bookRoutes'));
 app.use('/api/authors', require('./routes/authorRoutes'));
 app.use('/api/auth', require('./routes/authRoutes'));
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on ${PORT}`));
