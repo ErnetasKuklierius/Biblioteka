@@ -36,7 +36,7 @@ router.get('/search/:query', async (req, res) => {
       title: doc.title,
       authors: [author._id],
       publishedDate: doc.first_publish_year,
-      isbn: doc.isbn?.[0] || ""
+      isbn: doc.isbn?.[0] || "no isbn"
     });
     await newBook.save();
 
