@@ -10,7 +10,13 @@ export const App = () => {
     <Router>
       <nav>
         <Link to="/">Home</Link> <Link to="/authors">Authors</Link> <Link to="/login">Login</Link> <Link to="/register">Register</Link>
+
       </nav>
+      {localStorage.getItem("token") && (
+  <button onClick={() => { localStorage.removeItem("token"); window.location.reload(); }}>
+    Logout
+  </button>
+)}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/authors" element={<Authors />} />

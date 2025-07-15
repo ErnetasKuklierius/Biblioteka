@@ -7,15 +7,19 @@ import { AddBook } from "../components/addBook";
 export const Home = () => {
     const [books, setBooks] = useState([]);
 
+    const loadBooks = () => {
+      API.get("/books").then(res => setBooks(res.data));
+    }
+
     useEffect(() => { 
-        API.get("/books").then(res => setBooks(res.data));
+        loadBooks();
     }, [])
   return (
     <>
     <div>
-      <h1>Books </h1>
+      <h1>Library </h1>
       <Search onResults={setBooks} />
-      <BookList books={books} />
+      <BookList books={books} refresh={loadBooks} />
       {localStorage.getItem("token") && <AddBook />}
     </div>
     </>
