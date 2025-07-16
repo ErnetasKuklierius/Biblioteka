@@ -18,35 +18,59 @@ router.get('/:id', async (req, res) => {
 
 router.get('/search/:query', async (req, res) => {
   const query = req.params.query;
-  let books = await Book.find({ $or: [{ title: new RegExp(query, 'i') }, { isbn: query }] }).populate('authors');
+
+  let books = await Book.find({ 
+    $or: [
+      { title: new RegExp(query, 'i') }, 
+      { isbn: query }
+    ] 
+  }).populate('authors');
+
   if (books.length === 0) {
     const olRes = await axios.get(`https://openlibrary.org/search.json?q=${query}`);
-    const docs = olRes.data.docs.slice(0, 1);
+    const docs = olRes.data.docs.slice(0, 5);
+
     if (docs.length === 0) return res.status(404).json({ message: 'Not found' });
 
-    const doc = docs[0];
-    const authorName = doc.author_name?.[0] || "Unknown";
-    let author = await Author.findOne({ name: authorName });
-    if (!author) {
-      author = new Author({ name: authorName });
-      await author.save();
+    const savedBooks = [];
+
+    for (const doc of docs) {
+      const authorNames = doc.author_name || ["Unknown"];
+      const authorIds = [];
+
+      for (const name of authorNames) {
+        let author = await Author.findOne({ name });
+        if (!author) {
+          author = new Author({ name });
+          await author.save();
+        }
+        authorIds.push(author._id);
+      }
+
+      const newBook = new Book({
+        title: doc.title,
+        authors: authorIds,
+        publishedDate: doc.first_publish_year || "Unknown",
+        isbn: (doc.isbn && doc.isbn.length > 0) ? doc.isbn[0] : "no isbn"
+      });
+      await newBook.save();
+
+      for (const authorId of authorIds) {
+        await Author.findByIdAndUpdate(authorId, {
+          $addToSet: { books: newBook._id }
+        });
+      }
+
+      const fullBook = await Book.findById(newBook._id).populate('authors');
+      savedBooks.push(fullBook);
     }
 
-    const newBook = new Book({
-      title: doc.title,
-      authors: [author._id],
-      publishedDate: doc.first_publish_year,
-      isbn: doc.isbn?.[0] || "no isbn"
-    });
-    await newBook.save();
-
-    author.books.push(newBook._id);
-    await author.save();
-
-    books = [await Book.findById(newBook._id).populate('authors')];
+    books = savedBooks;
   }
+
   res.json(books);
 });
+
 
 router.post('/', auth, async (req, res) => {
   const { title, authors, publishedDate, isbn } = req.body;

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import API from "../api";
+import { AuthorSearch } from "../components/authorSearch";
 
 export const Authors = () => {
   const [authors, setAuthors] = useState([]);
@@ -43,6 +44,8 @@ export const Authors = () => {
   return (
     <>
     <h1>Authors</h1>
+
+    <AuthorSearch />
 
       {isAuth && (
         <div style={{ marginBottom: "1rem" }}>

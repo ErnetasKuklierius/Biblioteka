@@ -11,7 +11,7 @@ export const Search = ( { onResults }) => {
 
   return (
     <div>
-      <input placeholder="Search by title or ISBN" value={query} onChange={(e) => setQuery(e.target.value)} />
+      <input placeholder="Search by title, title or author" value={query} onChange={(e) => setQuery(e.target.value)} />
       <button onClick={handleSearch}>Search</button>
     </div>
   );
